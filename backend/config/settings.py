@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "visitors",
     "mess",
     "leave_requests",
+    "complaints",
 ]
 
 MIDDLEWARE = [
