@@ -7,6 +7,10 @@ MEALS = ("breakfast", "lunch", "dinner")
 
 
 class WeeklyMenuSerializer(serializers.ModelSerializer):
+    # The API replaces an existing week's menu, so model uniqueness validation
+    # must not reject the week before update_or_create can update it.
+    week_start = serializers.DateField()
+
     class Meta:
         model = WeeklyMenu
         fields = ("id", "week_start", "menu", "published_at")

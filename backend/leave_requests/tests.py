@@ -1,7 +1,6 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -15,8 +14,9 @@ class LeaveRequestApiTests(TestCase):
         self.student = user_model.objects.create_user(username="student-1", password="secret")
         self.other_student = user_model.objects.create_user(username="student-2", password="secret")
         self.warden = user_model.objects.create_user(username="warden-1", password="secret")
-        Group.objects.create(name="STUDENT").user_set.add(self.student, self.other_student)
-        Group.objects.create(name="WARDEN").user_set.add(self.warden)
+        self.student.role = "STUDENT"
+        self.other_student.role = "STUDENT"
+        self.warden.role = "WARDEN"
         self.payload = {
             "start_date": "2026-10-20",
             "end_date": "2026-10-22",

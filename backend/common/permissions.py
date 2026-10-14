@@ -1,28 +1,10 @@
-from collections.abc import Mapping
-
 from rest_framework.permissions import BasePermission, IsAuthenticated
 
 
 def _role_names(request):
-    """Read the role exposed by the shared authentication layer."""
-    user = request.user
-    values = [getattr(user, "role", None)]
-
-    token = request.auth
-    if isinstance(token, Mapping):
-        values.append(token.get("role"))
-    elif token is not None:
-        payload = getattr(token, "payload", None)
-        if isinstance(payload, Mapping):
-            values.append(payload.get("role"))
-        else:
-            values.append(getattr(token, "role", None))
-
-    groups = getattr(user, "groups", None)
-    if groups is not None:
-        values.extend(groups.values_list("name", flat=True))
-
-    return {str(value).strip().upper().removeprefix("ROLE_") for value in values if value}
+    """Use only the role loaded on the authenticated database user."""
+    role = getattr(request.user, "role", None)
+    return {role} if isinstance(role, str) and role else set()
 
 
 class HasAnyRole(BasePermission):
