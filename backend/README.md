@@ -10,3 +10,10 @@ The feature APIs use the shared authentication layer's `request.user.role` value
 - `PATCH /api/v1/visitors/{id}/exit` (Warden): records the supplied `exit_at`, or the current UTC time when omitted. A second exit update returns a conflict.
 
 The entry time is required and an active visit is represented by `exit_at: null`.
+
+## Weekly mess menu API (issue #15)
+
+- `POST /api/v1/mess/menu` (Admin): publish or replace the menu for a `week_start` date. The `menu` field is a non-empty JSON object containing the week's day and meal data.
+- `GET /api/v1/mess/menu` (Student, Warden, or Admin): return the most recently published weekly menu.
+
+For example, a menu may contain a `days` object keyed by weekday with meal names and item lists. The API keeps one published menu per week start date.
