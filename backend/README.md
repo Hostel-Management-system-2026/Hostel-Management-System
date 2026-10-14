@@ -17,3 +17,11 @@ The entry time is required and an active visit is represented by `exit_at: null`
 - `GET /api/v1/mess/menu` (Student, Warden, or Admin): return the most recently published weekly menu.
 
 Example `menu`: `{"days":{"Monday":{"breakfast":["Idli"],"lunch":["Rice"],"dinner":["Roti"]},"Tuesday":{"breakfast":["Poha"],"lunch":["Dal"],"dinner":["Rice"]},"Wednesday":{"breakfast":["Upma"],"lunch":["Rice"],"dinner":["Roti"]},"Thursday":{"breakfast":["Idli"],"lunch":["Dal"],"dinner":["Rice"]},"Friday":{"breakfast":["Poha"],"lunch":["Rice"],"dinner":["Roti"]},"Saturday":{"breakfast":["Upma"],"lunch":["Rice"],"dinner":["Roti"]},"Sunday":{"breakfast":["Dosa"],"lunch":["Rice"],"dinner":["Paneer"]}}}`. The API keeps one published menu per week start date.
+
+## Leave and outpass API (issue #16)
+
+- `POST /api/v1/leave` (Student): submit `start_date`, `end_date`, and `reason`. The API records the authenticated user's ID and creates the request as `PENDING`.
+- `GET /api/v1/leave` (Student or Warden): students see their own requests; wardens see requests awaiting their decision and completed requests.
+- `PATCH /api/v1/leave/{id}/decision` (Warden): send `{"decision":"approve"}` or `{"decision":"reject"}`. A request cannot be decided twice.
+
+Only Warden decisions can move a request from `PENDING` to `APPROVED` or `REJECTED`.

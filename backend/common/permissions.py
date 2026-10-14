@@ -48,3 +48,7 @@ class IsStudent(HasAnyRole):
 
 class IsStudentOrWardenOrAdmin(HasAnyRole):
     allowed_roles = frozenset({"STUDENT", "WARDEN", "ADMIN"})
+
+
+class IsStudentOrWarden(HasAnyRole):
+    allowed_roles = frozenset({"STUDENT", "WARDEN"})
