@@ -1,23 +1,34 @@
 from django.shortcuts import get_object_or_404
+
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.permissions import IsAdmin
 from .models import Notice
 from .serializers import NoticeSerializer
 
+class IsNoticeAdmin(BasePermission):
+"""Allow notice mutations only for users with the exact ADMIN role."""
+
+```
+def has_permission(self, request, view):
+    return (
+        request.user.is_authenticated
+        and getattr(request.user, "role", None) == "ADMIN"
+    )
+```
+
 def get_user_role(request):
-"""Return only the exact role stored on the authenticated user."""
+"""Use only the exact role stored on the authenticated user."""
 role = getattr(request.user, "role", None)
 return role if isinstance(role, str) else ""
 
 class NoticeCollectionView(APIView):
 def get_permissions(self):
 if self.request.method == "POST":
-return [IsAdmin()]
+return [IsNoticeAdmin()]
 return [IsAuthenticated()]
 
 ```
@@ -42,6 +53,7 @@ def post(self, request):
     serializer = NoticeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     notice = serializer.save(published_by=str(request.user.pk))
+
     return Response(
         NoticeSerializer(notice).data,
         status=status.HTTP_201_CREATED,
@@ -66,7 +78,7 @@ def get(self, request, notice_id):
     return Response(NoticeSerializer(notice).data)
 
 def patch(self, request, notice_id):
-    if not IsAdmin().has_permission(request, self):
+    if not IsNoticeAdmin().has_permission(request, self):
         raise PermissionDenied("Only admins can update notices.")
 
     notice = get_object_or_404(Notice, pk=notice_id)
@@ -77,10 +89,11 @@ def patch(self, request, notice_id):
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
+
     return Response(serializer.data)
 
 def delete(self, request, notice_id):
-    if not IsAdmin().has_permission(request, self):
+    if not IsNoticeAdmin().has_permission(request, self):
         raise PermissionDenied("Only admins can delete notices.")
 
     get_object_or_404(Notice, pk=notice_id).delete()
