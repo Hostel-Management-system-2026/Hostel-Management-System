@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from rest_framework.permissions import BasePermission, IsAuthenticated
 
 
@@ -7,10 +9,14 @@ def _role_names(request):
     values = [getattr(user, "role", None)]
 
     token = request.auth
-    if isinstance(token, dict):
+    if isinstance(token, Mapping):
         values.append(token.get("role"))
     elif token is not None:
-        values.append(getattr(token, "role", None))
+        payload = getattr(token, "payload", None)
+        if isinstance(payload, Mapping):
+            values.append(payload.get("role"))
+        else:
+            values.append(getattr(token, "role", None))
 
     groups = getattr(user, "groups", None)
     if groups is not None:
