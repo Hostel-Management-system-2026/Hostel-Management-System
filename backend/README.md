@@ -13,7 +13,7 @@ The entry time is required and an active visit is represented by `exit_at: null`
 
 ## Weekly mess menu API (issue #15)
 
-- `POST /api/v1/mess/menu` (Admin): publish or replace the menu for a `week_start` date. The `menu` field is a non-empty JSON object containing the week's day and meal data.
+- `POST /api/v1/mess/menu` (Admin): publish or replace the menu for a `week_start` date. `menu` must contain all seven days, each with non-empty `breakfast`, `lunch`, and `dinner` lists of item names.
 - `GET /api/v1/mess/menu` (Student, Warden, or Admin): return the most recently published weekly menu.
 
-For example, a menu may contain a `days` object keyed by weekday with meal names and item lists. The API keeps one published menu per week start date.
+Example `menu`: `{"days":{"Monday":{"breakfast":["Idli"],"lunch":["Rice"],"dinner":["Roti"]},"Tuesday":{"breakfast":["Poha"],"lunch":["Dal"],"dinner":["Rice"]},"Wednesday":{"breakfast":["Upma"],"lunch":["Rice"],"dinner":["Roti"]},"Thursday":{"breakfast":["Idli"],"lunch":["Dal"],"dinner":["Rice"]},"Friday":{"breakfast":["Poha"],"lunch":["Rice"],"dinner":["Roti"]},"Saturday":{"breakfast":["Upma"],"lunch":["Rice"],"dinner":["Roti"]},"Sunday":{"breakfast":["Dosa"],"lunch":["Rice"],"dinner":["Paneer"]}}}`. The API keeps one published menu per week start date.

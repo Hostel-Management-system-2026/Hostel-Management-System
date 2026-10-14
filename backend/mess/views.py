@@ -15,7 +15,7 @@ class WeeklyMenuView(APIView):
         return [IsStudentOrWardenOrAdmin()]
 
     def get(self, request):
-        menu = WeeklyMenu.objects.first()
+        menu = WeeklyMenu.objects.order_by("-published_at", "-week_start").first()
         if menu is None:
             raise NotFound("No weekly mess menu has been published yet.")
         return Response(WeeklyMenuSerializer(menu).data)
