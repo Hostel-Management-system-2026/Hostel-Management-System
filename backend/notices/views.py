@@ -1,3 +1,4 @@
+
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -9,93 +10,91 @@ from rest_framework.views import APIView
 from .models import Notice
 from .serializers import NoticeSerializer
 
-class IsNoticeAdmin(BasePermission):
-"""Allow notice mutations only for users with the exact ADMIN role."""
 
-```
-def has_permission(self, request, view):
-    return (
-        request.user.is_authenticated
-        and getattr(request.user, "role", None) == "ADMIN"
-    )
-```
+class IsNoticeAdmin(BasePermission):
+    """Allow notice mutations only for users with the exact ADMIN role."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and getattr(request.user, "role", None) == "ADMIN"
+        )
+
 
 def get_user_role(request):
-"""Use only the exact role stored on the authenticated user."""
-role = getattr(request.user, "role", None)
-return role if isinstance(role, str) else ""
+    """Use only the exact role stored on the authenticated user."""
+    role = getattr(request.user, "role", None)
+    return role if isinstance(role, str) else ""
+
 
 class NoticeCollectionView(APIView):
-def get_permissions(self):
-if self.request.method == "POST":
-return [IsNoticeAdmin()]
-return [IsAuthenticated()]
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsNoticeAdmin()]
+        return [IsAuthenticated()]
 
-```
-def get(self, request):
-    role = get_user_role(request)
+    def get(self, request):
+        role = get_user_role(request)
 
-    if role == "ADMIN":
-        notices = Notice.objects.all()
-    elif role == "STUDENT":
-        notices = Notice.objects.filter(
-            is_published=True,
-            audience__in=("ALL_STUDENTS", "STUDENTS"),
+        if role == "ADMIN":
+            notices = Notice.objects.all()
+        elif role == "STUDENT":
+            notices = Notice.objects.filter(
+                is_published=True,
+                audience__in=("ALL_STUDENTS", "STUDENTS"),
+            )
+        else:
+            raise PermissionDenied(
+                "Only students and admins can view notices."
+            )
+
+        return Response(NoticeSerializer(notices, many=True).data)
+
+    def post(self, request):
+        serializer = NoticeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        notice = serializer.save(published_by=str(request.user.pk))
+
+        return Response(
+            NoticeSerializer(notice).data,
+            status=status.HTTP_201_CREATED,
         )
-    else:
-        raise PermissionDenied(
-            "Only students and admins can view notices."
-        )
 
-    return Response(NoticeSerializer(notices, many=True).data)
-
-def post(self, request):
-    serializer = NoticeSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    notice = serializer.save(published_by=str(request.user.pk))
-
-    return Response(
-        NoticeSerializer(notice).data,
-        status=status.HTTP_201_CREATED,
-    )
-```
 
 class NoticeDetailView(APIView):
-permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-```
-def get(self, request, notice_id):
-    notice = get_object_or_404(Notice, pk=notice_id)
-    role = get_user_role(request)
+    def get(self, request, notice_id):
+        notice = get_object_or_404(Notice, pk=notice_id)
+        role = get_user_role(request)
 
-    if role != "ADMIN" and not (
-        role == "STUDENT"
-        and notice.is_published
-        and notice.audience in ("ALL_STUDENTS", "STUDENTS")
-    ):
-        raise PermissionDenied("You cannot view this notice.")
+        if role != "ADMIN" and not (
+            role == "STUDENT"
+            and notice.is_published
+            and notice.audience in ("ALL_STUDENTS", "STUDENTS")
+        ):
+            raise PermissionDenied("You cannot view this notice.")
 
-    return Response(NoticeSerializer(notice).data)
+        return Response(NoticeSerializer(notice).data)
 
-def patch(self, request, notice_id):
-    if not IsNoticeAdmin().has_permission(request, self):
-        raise PermissionDenied("Only admins can update notices.")
+    def patch(self, request, notice_id):
+        if not IsNoticeAdmin().has_permission(request, self):
+            raise PermissionDenied("Only admins can update notices.")
 
-    notice = get_object_or_404(Notice, pk=notice_id)
-    serializer = NoticeSerializer(
-        notice,
-        data=request.data,
-        partial=True,
-    )
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
+        notice = get_object_or_404(Notice, pk=notice_id)
+        serializer = NoticeSerializer(
+            notice,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-    return Response(serializer.data)
+        return Response(serializer.data)
 
-def delete(self, request, notice_id):
-    if not IsNoticeAdmin().has_permission(request, self):
-        raise PermissionDenied("Only admins can delete notices.")
+    def delete(self, request, notice_id):
+        if not IsNoticeAdmin().has_permission(request, self):
+            raise PermissionDenied("Only admins can delete notices.")
 
-    get_object_or_404(Notice, pk=notice_id).delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
-```
+        get_object_or_404(Notice, pk=notice_id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
