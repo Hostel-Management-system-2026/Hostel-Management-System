@@ -1,28 +1,14 @@
-from collections.abc import Mapping
-
 from rest_framework.permissions import BasePermission, IsAuthenticated
 
 
 def _role_names(request):
-    """Read the role exposed by the shared authentication layer."""
-    user = request.user
-    values = [getattr(user, "role", None)]
+    """The user's database role is the only source of truth.
 
-    token = request.auth
-    if isinstance(token, Mapping):
-        values.append(token.get("role"))
-    elif token is not None:
-        payload = getattr(token, "payload", None)
-        if isinstance(payload, Mapping):
-            values.append(payload.get("role"))
-        else:
-            values.append(getattr(token, "role", None))
-
-    groups = getattr(user, "groups", None)
-    if groups is not None:
-        values.extend(groups.values_list("name", flat=True))
-
-    return {str(value).strip().upper().removeprefix("ROLE_") for value in values if value}
+    The JWT "role" claim is for the frontend only and is never trusted here, so a
+    token issued before a role change cannot keep the old access.
+    """
+    role = getattr(request.user, "role", None)
+    return {str(role).strip().upper()} if role else set()
 
 
 class HasAnyRole(BasePermission):
