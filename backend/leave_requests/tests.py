@@ -11,11 +11,15 @@ class LeaveRequestApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         user_model = get_user_model()
-        self.student = user_model.objects.create_user(username="student-1", password="secret")
-        self.other_student = user_model.objects.create_user(username="student-2", password="secret")
-        self.warden = user_model.objects.create_user(username="warden-1", password="secret")
-        self.warden.role = "WARDEN"
-        self.warden.save()
+        self.student = user_model.objects.create_user(
+            username="student-1", password="secret", role="STUDENT"
+        )
+        self.other_student = user_model.objects.create_user(
+            username="student-2", password="secret", role="STUDENT"
+        )
+        self.warden = user_model.objects.create_user(
+            username="warden-1", password="secret", role="WARDEN"
+        )
         self.payload = {
             "start_date": "2026-10-20",
             "end_date": "2026-10-22",
