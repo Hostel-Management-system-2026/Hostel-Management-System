@@ -4,7 +4,7 @@ from rest_framework.test import APIClient, APIRequestFactory
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from common.permissions import IsAdmin
+from common.permissions import IsAdmin, IsWarden
 
 from .models import User
 
@@ -70,3 +70,35 @@ class AuthAndRoleTests(TestCase):
     def test_admin_is_allowed_on_admin_action(self):
         token = self.login("admin1", "Admin@12345").data["access"]
         self.assertEqual(self.call_admin_view(token).status_code, 200)
+
+
+class WardenOnlyView(APIView):
+    permission_classes = [IsWarden]
+
+    def get(self, request):
+        return Response({"ok": True})
+
+
+class StaleTokenTests(TestCase):
+    def test_old_warden_token_gets_403_after_role_changes_to_student(self):
+        user = User.objects.create_user("warden2", password="Warden@12345", role="WARDEN")
+        token = APIClient().post(
+            "/api/v1/auth/login/",
+            {"username": "warden2", "password": "Warden@12345"},
+            format="json",
+        ).data["access"]
+        self.assertEqual(AccessToken(token)["role"], "WARDEN")
+
+        factory = APIRequestFactory()
+
+        def call_warden_view():
+            request = factory.get("/warden-only/")
+            request.META["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+            return WardenOnlyView.as_view()(request)
+
+        self.assertEqual(call_warden_view().status_code, 200)
+
+        user.role = "STUDENT"
+        user.save()
+
+        self.assertEqual(call_warden_view().status_code, 403)
