@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "mess",
     "leave_requests",
     "notices",
+    "room_allocations",
 ]
 
 MIDDLEWARE = [
