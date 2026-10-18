@@ -26,18 +26,13 @@ class RoomAllocation(models.Model):
     released_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["student"],
-                condition=models.Q(released_at__isnull=True),
-                name="one_active_room_per_student",
-            ),
-            models.UniqueConstraint(
-                fields=["room"],
-                condition=models.Q(released_at__isnull=True),
-                name="one_active_allocation_per_room",
-            ),
-        ]
+      constraints = [
+        models.UniqueConstraint(
+            fields=["student"],
+            condition=models.Q(released_at__isnull=True),
+            name="one_active_room_per_student",
+        ),
+    ]
 
     def __str__(self):
         return f"{self.student} - {self.room}"

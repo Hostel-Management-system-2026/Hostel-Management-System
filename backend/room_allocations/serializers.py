@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 
 from accounts.models import User
@@ -31,25 +32,34 @@ class RoomAllocationSerializer(serializers.ModelSerializer):
         student = attrs["student"]
         room = attrs["room"]
 
+        # A student can have only one active room allocation.
         if RoomAllocation.objects.filter(
             student=student,
             released_at__isnull=True,
         ).exists():
             raise serializers.ValidationError(
-                {"student_id": "This student already has an active allocation."}
+                {
+                    "student_id": (
+                        "This student already has an active allocation."
+                    )
+                }
             )
 
+        # Reject rooms marked as unavailable.
         if not room.is_available:
             raise serializers.ValidationError(
                 {"room_id": "This room is not available."}
             )
 
-        if RoomAllocation.objects.filter(
+        # Allow multiple students, up to the room's capacity.
+        active_allocations = RoomAllocation.objects.filter(
             room=room,
             released_at__isnull=True,
-        ).exists():
+        ).count()
+
+        if active_allocations >= room.capacity:
             raise serializers.ValidationError(
-                {"room_id": "This room already has an active allocation."}
+                {"room_id": "This room has reached its capacity."}
             )
 
         return attrs
