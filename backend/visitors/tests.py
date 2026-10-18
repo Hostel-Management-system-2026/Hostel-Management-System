@@ -37,6 +37,19 @@ class VisitorApiTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(VisitorLog.objects.count(), 0)
 
+    def test_unauthenticated_request_returns_401(self):
+        response = self.client.post("/api/v1/visitors", self.payload, format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_jwt_role_claim_cannot_grant_warden_access(self):
+        user_without_role = SimpleNamespace(pk="user-1", is_authenticated=True)
+        self.client.force_authenticate(user_without_role, token={"role": "WARDEN"})
+
+        response = self.client.post("/api/v1/visitors", self.payload, format="json")
+
+        self.assertEqual(response.status_code, 403)
+
     def test_missing_entry_timestamp_is_rejected(self):
         self.client.force_authenticate(self.warden)
         payload = {key: value for key, value in self.payload.items() if key != "entry_at"}

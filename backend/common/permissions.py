@@ -2,13 +2,9 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 
 
 def _role_names(request):
-    """The user's database role is the only source of truth.
-
-    The JWT "role" claim is for the frontend only and is never trusted here, so a
-    token issued before a role change cannot keep the old access.
-    """
+    """Use only the role loaded on the authenticated database user."""
     role = getattr(request.user, "role", None)
-    return {str(role).strip().upper()} if role else set()
+    return {role} if isinstance(role, str) and role else set()
 
 
 class HasAnyRole(BasePermission):
