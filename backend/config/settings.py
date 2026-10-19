@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "notices",
     "room_allocations",
     "complaints",
+    "profiles",
 ]
 
 MIDDLEWARE = [
