@@ -8,15 +8,19 @@ DEBUG = os.environ.get("HMS_DEBUG", "false").lower() == "true"
 ALLOWED_HOSTS = [host for host in os.environ.get("HMS_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host]
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "accounts",
     "visitors",
     "mess",
     "leave_requests",
+    "notices",
+    "room_allocations",
     "profiles",
 ]
 
@@ -75,6 +79,8 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = "accounts.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
