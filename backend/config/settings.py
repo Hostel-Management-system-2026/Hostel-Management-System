@@ -8,6 +8,7 @@ DEBUG = os.environ.get("HMS_DEBUG", "false").lower() == "true"
 ALLOWED_HOSTS = [host for host in os.environ.get("HMS_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host]
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -20,6 +21,7 @@ INSTALLED_APPS = [
     "leave_requests",
     "notices",
     "room_allocations",
+    "profiles",
 ]
 
 MIDDLEWARE = [

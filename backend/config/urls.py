@@ -8,4 +8,5 @@ urlpatterns = [
     path("api/v1/", include("leave_requests.urls")),
     path("api/v1/", include("notices.urls")),
     path("api/v1/", include("room_allocations.urls")),
+    path("api/v1/", include("profiles.urls")),
 ]
