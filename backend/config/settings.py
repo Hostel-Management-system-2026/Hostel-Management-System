@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "leave_requests",
     "notices",
     "room_allocations",
+    "complaints",
     "profiles",
 ]
 
