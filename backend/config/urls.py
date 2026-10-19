@@ -1,3 +1,4 @@
+
 from django.urls import include, path
 
 
@@ -8,5 +9,6 @@ urlpatterns = [
     path("api/v1/", include("leave_requests.urls")),
     path("api/v1/", include("notices.urls")),
     path("api/v1/", include("room_allocations.urls")),
+    path("api/v1/", include("profiles.urls")),
     path("api/v1/", include("complaints.urls")),
 ]
