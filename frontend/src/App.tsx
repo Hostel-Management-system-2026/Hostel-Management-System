@@ -15,6 +15,7 @@ import { roleLabel, type Role } from './auth/roles';
 import FeaturePlaceholder from './components/FeaturePlaceholder';
 import ProfilesPage from './features/profiles/ProfilesPage';
 import ComplaintsPage from './features/complaints/ComplaintsPage';
+import NoticesPage from './features/notices/NoticesPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 
@@ -204,8 +205,13 @@ function FeatureRoute({ item }: { item: NavItem }) {
     return <ProfilesPage />;
   }
 
+
   if (item.to === '/complaints') {
     return <ComplaintsPage />;
+  }
+
+  if (item.to === '/notices') {
+    return <NoticesPage />;
   }
 
   return (
@@ -215,6 +221,7 @@ function FeatureRoute({ item }: { item: NavItem }) {
       endpoint={item.endpoint}
     />
   );
+
 }
 
 function ForbiddenPage() {
