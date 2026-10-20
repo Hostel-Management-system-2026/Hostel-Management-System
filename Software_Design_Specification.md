@@ -253,8 +253,9 @@ All endpoints communicate over HTTPS using standard JSON payloads and JWT authen
 | Verb | Endpoint Path | Description | Access Level | Req / Rule Mapping |
 | :--- | :--- | :--- | :--- | :--- |
 | `POST` | `/api/v1/auth/login` | Authenticate user (Admin/Warden/Student) | Public | SR-01 |
-| `GET` | `/api/v1/profiles/{student_id}`| View student profile details | Admin / Student (Self) | FR-02, SO-01 |
-| `PUT` | `/api/v1/profiles/{student_id}`| Maintain student profile | Admin Only | FR-02, SR-02 |
+| `GET` | `/api/v1/profiles/me` | View the authenticated student's own profile | Student | FR-02, SO-01 |
+| `GET`, `POST` | `/api/v1/profiles` | List or create student profiles | Admin Only | FR-02, SR-02 |
+| `GET`, `PUT`, `PATCH`, `DELETE` | `/api/v1/profiles/{profile_id}` | View or maintain a student profile | Admin Only | FR-02, SR-02 |
 | `POST` | `/api/v1/rooms/allocate` | Allocate room to registered student | Admin Only | FR-01, BR-01 |
 | `GET` | `/api/v1/fees/my` | View student fee statement & balance | Student | FR-03, BR-03 |
 | `POST` | `/api/v1/fees/pay` | Record partial or full fee payment | Student | FR-03, BR-03 |

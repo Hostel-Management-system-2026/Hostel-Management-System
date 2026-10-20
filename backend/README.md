@@ -2,7 +2,7 @@
 
 This backend follows the project Test Plan's proposed Django REST Framework and PostgreSQL stack. For local work, set up a virtual environment, install `requirements.txt`, copy `.env.example` into your environment, and run `python manage.py migrate` followed by `python manage.py runserver`.
 
-The feature APIs use the authenticated database user's `role` field with one of the exact values `STUDENT`, `WARDEN`, or `ADMIN`. Django REST Framework uses SimpleJWT access tokens (`Authorization: Bearer <access_token>`) to populate `request.user`; authorization always reads `request.user.role`, never a role claim or a client-supplied value. Missing, invalid, or expired tokens receive `401`; valid tokens without the required role receive `403`. The authentication issue must provide this role field on its User model before these feature APIs are integrated.
+The APIs use the authenticated database user's `role` field with one of the exact values `STUDENT`, `WARDEN`, or `ADMIN`. Sign in with `POST /api/v1/auth/login/` using a username and password; the response includes SimpleJWT access and refresh tokens. Send the access token as `Authorization: Bearer <access_token>`. Authorization reads `request.user.role` from the database, never the role claim in a token or a client-supplied value. Missing, invalid, or expired tokens receive `401`; valid tokens without the required role receive `403`.
 
 ## Visitor logging API (issue #14)
 

@@ -1,9 +1,13 @@
 
+from concurrent.futures import ThreadPoolExecutor
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.db import close_old_connections, connections
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from rest_framework.test import APIClient
+from rest_framework import serializers
 
 from .models import Room, RoomAllocation
+from .serializers import RoomAllocationSerializer
 
 User = get_user_model()
 
@@ -76,6 +80,7 @@ class RoomAllocationTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(RoomAllocation.objects.count(), 0)
+
 
     def test_student_cannot_have_two_active_allocations(self):
         RoomAllocation.objects.create(
@@ -183,3 +188,41 @@ class RoomAllocationTests(TestCase):
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(RoomAllocation.objects.count(), 0)
+
+
+class RoomAllocationCapacityConcurrencyTests(TransactionTestCase):
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_concurrent_requests_cannot_overfill_a_room(self):
+        from threading import Barrier
+
+        room = Room.objects.create(room_number="RACE-101", capacity=1)
+        students = [
+            User.objects.create_user(username=f"race-{i}", password="test", role="STUDENT")
+            for i in range(2)
+        ]
+        barrier = Barrier(2)
+
+        def allocate(student_id):
+            close_old_connections()
+            try:
+                serializer = RoomAllocationSerializer(
+                    data={"student_id": student_id, "room_id": room.pk}
+                )
+                serializer.is_valid(raise_exception=True)
+                barrier.wait(timeout=10)
+                try:
+                    serializer.save()
+                    return "created"
+                except serializers.ValidationError:
+                    return "capacity-rejected"
+            finally:
+                connections.close_all()
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(allocate, [student.pk for student in students]))
+
+        self.assertCountEqual(results, ["created", "capacity-rejected"])
+        self.assertEqual(
+            RoomAllocation.objects.filter(room=room, released_at__isnull=True).count(),
+            1,
+        )
