@@ -1,0 +1,18 @@
+import { useState, type FormEvent } from 'react'
+import { api } from '../../api/client'
+import { Field, LoadState, Page, dateLabel, message, useResource } from '../shared'
+
+type Visitor = { id: number; visitor_name: string; student_id: string; room_number: string; purpose: string; entry_at: string; exit_at: string | null }
+const localNow = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16) }
+export default function VisitorsPage() {
+  const [filter, setFilter] = useState<'all' | 'active'>('all'); const resource = useResource(() => api.get<Visitor[]>(filter === 'active' ? '/visitors?active=true' : '/visitors'), [filter])
+  const [name, setName] = useState(''); const [student, setStudent] = useState(''); const [room, setRoom] = useState(''); const [purpose, setPurpose] = useState(''); const [entry, setEntry] = useState(localNow); const [busy, setBusy] = useState(false); const [error, setError] = useState('')
+  async function submit(e: FormEvent) { e.preventDefault(); setBusy(true); setError(''); try { await api.post<Visitor>('/visitors', { visitor_name: name, student_id: student, room_number: room, purpose, entry_at: new Date(entry).toISOString() }); setName(''); setStudent(''); setRoom(''); setPurpose(''); setEntry(localNow()); await resource.reload() } catch (err) { setError(message(err)) } finally { setBusy(false) } }
+  async function closeVisit(row: Visitor) { setError(''); try { await api.patch<Visitor>(`/visitors/${row.id}/exit`, {}); await resource.reload() } catch (err) { setError(message(err)) } }
+  return <Page title="Visitors" intro="Record arrivals, review visitor history, and check out active visits.">
+    <form className="feature-form" onSubmit={submit}><h3>Log visitor arrival</h3><Field label="Visitor name"><input required maxLength={160} value={name} onChange={e => setName(e.target.value)} /></Field><Field label="Student ID"><input required value={student} onChange={e => setStudent(e.target.value)} /></Field><Field label="Room number"><input required value={room} onChange={e => setRoom(e.target.value)} /></Field><Field label="Purpose"><input maxLength={240} value={purpose} onChange={e => setPurpose(e.target.value)} /></Field><Field label="Entry time"><input required type="datetime-local" value={entry} onChange={e => setEntry(e.target.value)} /></Field><button className="primary-button form-submit" disabled={busy}>{busy ? 'Recording…' : 'Record arrival'}</button></form>
+    {error && <div className="state-error" role="alert">{error}</div>}<div className="action-row visitor-filter"><button className={`secondary-button ${filter === 'all' ? 'filter-active' : ''}`} onClick={() => setFilter('all')}>All visits</button><button className={`secondary-button ${filter === 'active' ? 'filter-active' : ''}`} onClick={() => setFilter('active')}>On premises</button></div>
+    <LoadState loading={resource.loading} error={resource.error} empty={!resource.loading && !resource.error && !resource.data?.length} onRetry={resource.reload} />
+    <div className="record-list">{resource.data?.map(row => <article className="record-card" key={row.id}><div className="record-top"><div><span className={`status-badge ${row.exit_at ? 'status-open' : 'status-resolved'}`}>{row.exit_at ? 'CHECKED OUT' : 'ON PREMISES'}</span><h3>{row.visitor_name}</h3></div><time>Entry {dateLabel(row.entry_at)}</time></div><p>Visiting {row.student_id} · Room {row.room_number}{row.purpose && ` · ${row.purpose}`}{row.exit_at && ` · Exit ${dateLabel(row.exit_at)}`}</p>{!row.exit_at && <button className="secondary-button" onClick={() => void closeVisit(row)}>Record departure</button>}</article>)}</div>
+  </Page>
+}
