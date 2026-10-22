@@ -21,6 +21,15 @@ class Conflict(APIException):
 class VisitorCollectionView(APIView):
     permission_classes = (IsWarden,)
 
+    def get(self, request):
+        records = VisitorLog.objects.all()
+        active = request.query_params.get("active")
+        if active == "true":
+            records = records.filter(exit_at__isnull=True)
+        elif active == "false":
+            records = records.filter(exit_at__isnull=False)
+        return Response(VisitorLogSerializer(records, many=True).data)
+
     def post(self, request):
         serializer = VisitorLogSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

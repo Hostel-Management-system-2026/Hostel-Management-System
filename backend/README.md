@@ -6,10 +6,17 @@ The feature APIs use the authenticated database user's `role` field with one of 
 
 ## Visitor logging API (issue #14)
 
+- `GET /api/v1/visitors` (Warden): list visitor history; add `?active=true` to list current visits or `?active=false` for completed visits.
 - `POST /api/v1/visitors` (Warden): `visitor_name`, `student_id`, `room_number`, `entry_at` are required; `purpose` and `exit_at` are optional.
 - `PATCH /api/v1/visitors/{id}/exit` (Warden): records the supplied `exit_at`, or the current UTC time when omitted. A second exit update returns a conflict.
 
 The entry time is required and an active visit is represented by `exit_at: null`.
+
+## Room inventory and allocations
+
+- `GET /api/v1/rooms/` (Admin): list room IDs, room numbers, availability, capacity, occupancy, and available beds.
+- `GET, POST /api/v1/allocations/` (Admin): list allocations or assign a student account to a room using numeric `student_id` and `room_id` values.
+- `PATCH /api/v1/allocations/{id}/release` (Admin): release an active allocation. Releasing an allocation twice returns a conflict.
 
 ## Weekly mess menu API (issue #15)
 

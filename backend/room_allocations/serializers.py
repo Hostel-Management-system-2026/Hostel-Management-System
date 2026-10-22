@@ -6,15 +6,15 @@ from .models import Room, RoomAllocation
 
 
 class RoomAllocationSerializer(serializers.ModelSerializer):
+    student_username = serializers.CharField(source="student.username", read_only=True)
+    room_number = serializers.CharField(source="room.room_number", read_only=True)
     student_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role=User.Role.STUDENT),
         source="student",
-        write_only=True,
     )
     room_id = serializers.PrimaryKeyRelatedField(
         queryset=Room.objects.all(),
         source="room",
-        write_only=True,
     )
 
     class Meta:
@@ -23,6 +23,8 @@ class RoomAllocationSerializer(serializers.ModelSerializer):
             "id",
             "student_id",
             "room_id",
+            "student_username",
+            "room_number",
             "allocated_at",
             "released_at",
         ]

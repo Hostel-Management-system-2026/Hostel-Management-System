@@ -25,9 +25,15 @@ Copy `.env.example` to `.env.local` only when the defaults need changing. `VITE_
 | Profiles | `GET /profiles/me`, collection `GET/POST /profiles`, detail `GET/PUT/PATCH/DELETE /profiles/{id}` |
 | Complaints | `GET/POST /complaints`, detail status transition `PATCH /complaints/{id}` |
 | Notices | `GET/POST /notices`, detail `GET/PATCH/DELETE /notices/{id}` |
-| Room allocations | `GET/POST /allocations/` |
-| Visitors | `POST /visitors`, exit `PATCH /visitors/{id}/exit` |
+| Room allocations | inventory `GET /rooms/`, allocations `GET/POST /allocations/`, release `PATCH /allocations/{id}/release` |
+| Visitors | `GET/POST /visitors`, exit `PATCH /visitors/{id}/exit` |
 | Mess menu | `GET/POST /mess/menu` |
 | Leave requests | `GET/POST /leave`, decision `PATCH /leave/{id}/decision` |
 
-There is no room inventory endpoint or password recovery endpoint on this base. Feature workspaces are starter slots; implement their screens against the contracts above and don't present unavailable flows as working.
+There is no password recovery endpoint on this base. Don't present that unavailable flow as working.
+
+## Frontend implementation status
+
+The current client includes role-specific workflows for profiles, complaints, notices, room allocations, visitor check-in/check-out and history, weekly menus, and leave requests. The allocation screen uses live room capacity and occupancy data; the visitor screen can filter current and completed visits.
+
+Allocation creation still uses the numeric student account ID accepted by the API. Password recovery is unavailable because there is no backend route for it.

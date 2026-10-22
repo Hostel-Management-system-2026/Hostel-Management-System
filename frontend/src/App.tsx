@@ -1,4 +1,3 @@
-
 import {
   Link,
   NavLink,
@@ -16,6 +15,10 @@ import FeaturePlaceholder from './components/FeaturePlaceholder';
 import ProfilesPage from './features/profiles/ProfilesPage';
 import ComplaintsPage from './features/complaints/ComplaintsPage';
 import NoticesPage from './features/notices/NoticesPage';
+import AllocationsPage from './features/allocations/AllocationsPage';
+import VisitorsPage from './features/visitors/VisitorsPage';
+import MessPage from './features/mess/MessPage';
+import LeavePage from './features/leave/LeavePage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 
@@ -201,17 +204,15 @@ function AppShell() {
 }
 
 function FeatureRoute({ item }: { item: NavItem }) {
-  if (item.to === '/profiles/me' || item.to === '/profiles') {
-    return <ProfilesPage />;
-  }
-
-
-  if (item.to === '/complaints') {
-    return <ComplaintsPage />;
-  }
-
-  if (item.to === '/notices') {
-    return <NoticesPage />;
+  switch (item.to) {
+    case '/profiles/me':
+    case '/profiles': return <ProfilesPage />;
+    case '/complaints': return <ComplaintsPage />;
+    case '/notices': return <NoticesPage />;
+    case '/allocations': return <AllocationsPage />;
+    case '/visitors': return <VisitorsPage />;
+    case '/mess': return <MessPage />;
+    case '/leave': return <LeavePage />;
   }
 
   return (
