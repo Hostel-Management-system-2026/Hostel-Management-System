@@ -46,4 +46,5 @@ Complaint.objects.bulk_create(
 
 token = AccessToken.for_user(user)
 token.set_exp(lifetime=timedelta(minutes=20))
+print(f"Benchmark account: {username}", file=sys.stderr)
 print(token)

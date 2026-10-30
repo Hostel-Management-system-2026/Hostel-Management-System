@@ -29,6 +29,14 @@ python docs/benchmark_sprint2_response_time.py
 Remove-Item Env:HMS_BENCHMARK_TOKEN
 ```
 
+The preparation command prints the generated username as `Benchmark account:` while keeping the JWT on standard output. After benchmarking, remove that account and its 100 fixture complaints by passing the exact printed username:
+
+```powershell
+python docs/cleanup_sprint2_response_time.py sprint2_perf_student_0123abcd
+```
+
+Replace the example username with the exact value printed during preparation. The cleanup command only accepts the benchmark username prefix, removes complaints titled `Perf fixture ...` for that account, and refuses to run when PostgreSQL is selected.
+
 ## Execution record
 
 - **Date:** 2026-10-30
