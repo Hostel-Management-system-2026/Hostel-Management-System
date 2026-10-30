@@ -58,7 +58,10 @@ def main():
                     status_code = response.status
                     success = 200 <= response.status < 300
             except urllib.error.HTTPError as error:
-                status_code = error.code
+                try:
+                    status_code = error.code
+                finally:
+                    error.close()
             except (urllib.error.URLError, TimeoutError, OSError):
                 success = False
             elapsed_ms = (time.monotonic() - request_started) * 1000

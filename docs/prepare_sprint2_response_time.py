@@ -24,11 +24,12 @@ from complaints.models import Complaint  # noqa: E402
 from rest_framework_simplejwt.tokens import AccessToken  # noqa: E402
 
 
-username = "sprint2_perf_student"
-user, _ = User.objects.get_or_create(username=username, defaults={"role": User.Role.STUDENT})
-user.role = User.Role.STUDENT
-user.set_password(secrets.token_urlsafe(24))
-user.save(update_fields=("role", "password"))
+username = f"sprint2_perf_student_{secrets.token_hex(8)}"
+user = User.objects.create_user(
+    username=username,
+    password=secrets.token_urlsafe(24),
+    role=User.Role.STUDENT,
+)
 
 Complaint.objects.filter(student_id=str(user.pk), title__startswith="Perf fixture").delete()
 Complaint.objects.bulk_create(
