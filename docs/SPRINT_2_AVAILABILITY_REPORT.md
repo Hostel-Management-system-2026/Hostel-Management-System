@@ -1,13 +1,14 @@
-# Sprint 2 – Availability Test Report
-
 ## 1. Test Information
 
 - **Issue:** #21 – Measure and meet the availability target
 - **Requirement:** NFR-03
 - **Test Case:** TC-014
 - **Environment:** Local development environment
-- **Observation period:** 1,000 seconds (16 minutes, 40 seconds)
-- **Monitoring interval:** 10 seconds
+- **Monitoring source:** Local Django API
+- **Endpoint:** `/api/v1/complaints`
+- **Monitoring interval:** Approximately 10 seconds
+- **Number of checks:** 100
+- **Measured observation span:** 992 seconds (based on CSV timestamps)
 
 ## 2. Test Results
 
@@ -16,28 +17,19 @@
 | Total API checks | 100 |
 | Successful checks | 100 |
 | Failed checks | 0 |
-| Measured availability | 100% |
-| Required availability | 99% |
-| Result | PASSED |
+| Sampled success rate | 100% |
+| Required target | 99% |
 
-## 3. Calculation
+## 3. Monitoring Method
 
-Availability = (Successful checks / Total checks) × 100
+The authenticated Complaints API endpoint was monitored from the local development environment using HTTP GET requests and JWT Bearer authentication. Access tokens were refreshed during the test to avoid authentication expiry affecting the results.
 
-Availability = (100 / 100) × 100 = **100%**
+The CSV timestamps span approximately 992 seconds from the first recorded check to the last recorded check.
 
-## 4. Authentication Handling
+## 4. Conclusion and Limitations
 
-JWT authentication was used to access the Complaints API. Access tokens were refreshed during the test to prevent token expiry from being incorrectly counted as service downtime.
+All 100 sampled API checks returned successful responses during this local test.
 
-## 5. Evidence
+The sampled success rate was 100%. This is preliminary local evidence only. It does not demonstrate sustained availability or establish that the production availability target of 99% has been met.
 
-Detailed check timestamps, response times, and outcomes are recorded in:
-
-`backend/availability_results_corrected.csv`
-
-## 6. Conclusion
-
-The local API availability test achieved 100% successful responses across 100 checks, exceeding the 99% target during the measured observation period.
-
-**Limitation:** This result represents a local development test only. It does not establish long-term or production availability.
+The observation period and monitoring method should be formally agreed with the project team before treating this as final NFR-03 acceptance evidence.
