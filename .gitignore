@@ -2,3 +2,8 @@ __pycache__/
 *.py[cod]
 .venv/
 db.sqlite3
+
+# Load testing credentials and generated reports
+load_tests/data/students.csv
+load_tests/results/*.csv
+load_tests/results/*.html
