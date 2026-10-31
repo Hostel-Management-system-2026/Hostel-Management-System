@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "complaints",
     "profiles",
     "facilities",
+    "fees",
 ]
 
 MIDDLEWARE = [
