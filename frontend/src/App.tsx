@@ -11,7 +11,6 @@ import {
 import { useAuth } from './auth/AuthContext';
 import { RequireAuth, RequireRole } from './auth/RouteGuards';
 import { roleLabel, type Role } from './auth/roles';
-import FeaturePlaceholder from './components/FeaturePlaceholder';
 import ProfilesPage from './features/profiles/ProfilesPage';
 import ComplaintsPage from './features/complaints/ComplaintsPage';
 import NoticesPage from './features/notices/NoticesPage';
@@ -19,6 +18,8 @@ import AllocationsPage from './features/allocations/AllocationsPage';
 import VisitorsPage from './features/visitors/VisitorsPage';
 import MessPage from './features/mess/MessPage';
 import LeavePage from './features/leave/LeavePage';
+import FacilitiesPage from './features/facilities/FacilitiesPage';
+import FeesPage from './features/fees/FeesPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 
@@ -97,6 +98,22 @@ const navItems: NavItem[] = [
     endpoint: 'GET, POST /api/v1/leave',
     description: 'Submit requests or review pending outpasses.',
   },
+  {
+    label: 'Facilities',
+    to: '/facilities',
+    icon: 'F',
+    roles: ['STUDENT', 'WARDEN', 'ADMIN'],
+    endpoint: 'GET /api/v1/facilities/ · POST /api/v1/facility-bookings/',
+    description: 'Review availability, book slots, or maintain the facility catalog.',
+  },
+  {
+    label: 'Fees',
+    to: '/fees',
+    icon: '$',
+    roles: ['STUDENT', 'ADMIN'],
+    endpoint: 'GET /api/v1/fees/my · POST /api/v1/fees/pay',
+    description: 'Review balances, record payments, and manage fee records.',
+  },
 ];
 
 function AppShell() {
@@ -164,7 +181,7 @@ function AppShell() {
           </div>
 
           <div className="sidebar-version">
-            HOSTEL MANAGEMENT SYSTEM <span>v0.1</span>
+            HOSTEL MANAGEMENT SYSTEM <span>v1.0.1</span>
           </div>
         </div>
       </aside>
@@ -213,16 +230,11 @@ function FeatureRoute({ item }: { item: NavItem }) {
     case '/visitors': return <VisitorsPage />;
     case '/mess': return <MessPage />;
     case '/leave': return <LeavePage />;
+    case '/facilities': return <FacilitiesPage />;
+    case '/fees': return <FeesPage />;
   }
 
-  return (
-    <FeaturePlaceholder
-      title={item.label}
-      description={item.description}
-      endpoint={item.endpoint}
-    />
-  );
-
+  return <Navigate to="/dashboard" replace />;
 }
 
 function ForbiddenPage() {
