@@ -9,17 +9,22 @@ const workspaces = {
     ['Notices', 'Read updates from your hostel', '/notices'],
     ['Mess menu', 'See this week’s meals', '/mess'],
     ['Leave request', 'Request an outpass', '/leave'],
+    ['Fees', 'Review your balance and payments', '/fees'],
+    ['Facilities', 'Check availability and book a slot', '/facilities'],
   ],
   WARDEN: [
     ['Visitors', 'Log arrivals and departures', '/visitors'],
     ['Leave requests', 'Review student outpasses', '/leave'],
     ['Complaints', 'Review and update reports', '/complaints'],
+    ['Facilities', 'Maintain the facility catalog', '/facilities'],
   ],
   ADMIN: [
     ['Student profiles', 'Maintain student records', '/profiles'],
     ['Room allocations', 'View and assign rooms', '/allocations'],
     ['Notices', 'Publish hostel announcements', '/notices'],
     ['Mess menu', 'Publish the weekly menu', '/mess'],
+    ['Fees', 'Create and maintain fee records', '/fees'],
+    ['Facilities', 'Maintain the facility catalog', '/facilities'],
   ],
 } as const
 

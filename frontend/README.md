@@ -29,11 +29,13 @@ Copy `.env.example` to `.env.local` only when the defaults need changing. `VITE_
 | Visitors | `GET/POST /visitors`, exit `PATCH /visitors/{id}/exit` |
 | Mess menu | `GET/POST /mess/menu` |
 | Leave requests | `GET/POST /leave`, decision `PATCH /leave/{id}/decision` |
+| Facilities | student catalog `GET /facilities/`, availability `GET /facilities/{id}/availability/?date=YYYY-MM-DD`, booking `POST /facility-bookings/`, staff catalog `GET/POST /staff/facilities/`, update `PATCH /staff/facilities/{id}/` |
+| Fees | student statement `GET /fees/my`, payment entry `POST /fees/pay`, staff records `GET/POST /fees/records`, total update `PATCH /fees/records/{id}` |
 
 There is no password recovery endpoint on this base. Don't present that unavailable flow as working.
 
 ## Frontend implementation status
 
-The current client includes role-specific workflows for profiles, complaints, notices, room allocations, visitor check-in/check-out and history, weekly menus, and leave requests. The allocation screen uses live room capacity and occupancy data; the visitor screen can filter current and completed visits.
+The current client includes role-specific workflows for profiles, complaints, notices, room allocations, visitor check-in/check-out and history, weekly menus, leave requests, facility availability and booking, and fee statements and payments. Admins can also manage fee records; wardens and admins can maintain facility entries. The allocation screen uses live room capacity and occupancy data; the visitor screen can filter current and completed visits.
 
 Allocation creation still uses the numeric student account ID accepted by the API. Password recovery is unavailable because there is no backend route for it.
