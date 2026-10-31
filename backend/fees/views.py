@@ -1,26 +1,27 @@
-from django.shortcuts import render
-
-# Create your views here.
 from decimal import Decimal
 from django.db import transaction
-from rest_framework import status
+from django.shortcuts import render
+from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.permissions import IsStudent
+from common.permissions import IsAdmin, IsStudent
 from .models import FeeRecord, Payment
-from .serializers import FeeRecordSerializer, PaymentCreateSerializer
+from .serializers import (
+    FeeRecordSerializer,
+    PaymentCreateSerializer,
+    StaffFeeRecordSerializer,
+)
 
 
 class StudentFeeView(APIView):
     permission_classes = (IsAuthenticated, IsStudent)
 
     def get(self, request):
-        try:
-            fee_record = request.user.fee_record
-        except FeeRecord.DoesNotExist:
+        fee_record = FeeRecord.objects.filter(student=request.user).first()
+        if not fee_record:
             return Response({"detail": "Fee record not found for student."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = FeeRecordSerializer(fee_record)
@@ -31,9 +32,8 @@ class RecordPaymentView(APIView):
     permission_classes = (IsAuthenticated, IsStudent)
 
     def post(self, request):
-        try:
-            fee_record = request.user.fee_record
-        except FeeRecord.DoesNotExist:
+        fee_record = FeeRecord.objects.filter(student=request.user).first()
+        if not fee_record:
             return Response({"detail": "Fee record not found for student."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PaymentCreateSerializer(data=request.data)
@@ -58,3 +58,16 @@ class RecordPaymentView(APIView):
             fee_record.save()
 
         return Response(FeeRecordSerializer(fee_record).data, status=status.HTTP_201_CREATED)
+
+
+class StaffFeeRecordListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAdmin,)
+    serializer_class = StaffFeeRecordSerializer
+    queryset = FeeRecord.objects.select_related("student").order_by("student__username")
+
+
+class StaffFeeRecordDetailView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAdmin,)
+    serializer_class = StaffFeeRecordSerializer
+    queryset = FeeRecord.objects.select_related("student")
+    http_method_names = ["get", "patch", "head", "options"]
