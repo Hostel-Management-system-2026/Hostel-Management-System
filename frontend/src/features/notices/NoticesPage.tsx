@@ -133,20 +133,25 @@ export default function NoticesPage() {
     }
 
     return (
-        <section>
-            <h1>Notices</h1>
-            <p>View important hostel announcements and updates.</p>
+        <section className="feature-page">
+            <header className="feature-header">
+                <div>
+                    <p className="eyebrow">HOSTEL MANAGEMENT</p>
+                    <h1>Notices</h1>
+                    <p>View important hostel announcements and updates.</p>
+                </div>
+            </header>
 
-            {error && <p role="alert">{error}</p>}
-            {message && <p role="status">{message}</p>}
+            {error && <div className="feedback error-feedback" role="alert">{error}</div>}
+            {message && <div className="feedback success-feedback" role="status">{message}</div>}
 
             {isAdmin && (
-                <section>
+                <section className="feature-card">
                     <h2>{editingId !== null ? 'Edit Notice' : 'Create Notice'}</h2>
 
-                    <form onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="notice-title">Title</label>
+                    <form className="profile-form" onSubmit={handleSubmit}>
+                        <label>
+                            <span>Title</span>
                             <input
                                 id="notice-title"
                                 value={title}
@@ -154,10 +159,10 @@ export default function NoticesPage() {
                                 maxLength={180}
                                 required
                             />
-                        </div>
+                        </label>
 
-                        <div>
-                            <label htmlFor="notice-body">Notice body</label>
+                        <label className="notice-body-field">
+                            <span>Notice body</span>
                             <textarea
                                 id="notice-body"
                                 value={body}
@@ -166,10 +171,10 @@ export default function NoticesPage() {
                                 rows={6}
                                 required
                             />
-                        </div>
+                        </label>
 
-                        <div>
-                            <label htmlFor="notice-audience">Audience</label>
+                        <label>
+                            <span>Audience</span>
                             <select
                                 id="notice-audience"
                                 value={audience}
@@ -178,38 +183,37 @@ export default function NoticesPage() {
                                 <option value="ALL_STUDENTS">All students</option>
                                 <option value="STUDENTS">Students</option>
                             </select>
-                        </div>
+                        </label>
 
-                        <div>
-                            <label htmlFor="notice-published">
-                                <input
-                                    id="notice-published"
-                                    type="checkbox"
-                                    checked={isPublished}
-                                    onChange={(event) => setIsPublished(event.target.checked)}
-                                />
-                                Published
-                            </label>
-                        </div>
+                        <label className="notice-publish-toggle">
+                            <input
+                                id="notice-published"
+                                type="checkbox"
+                                checked={isPublished}
+                                onChange={(event) => setIsPublished(event.target.checked)}
+                            />
+                            <span>Publish this notice</span>
+                        </label>
 
-                        <button type="submit" disabled={saving}>
-                            {saving
-                                ? 'Saving...'
-                                : editingId !== null
-                                    ? 'Update Notice'
-                                    : 'Create Notice'}
-                        </button>
-
-                        {editingId !== null && (
-                            <button type="button" onClick={resetForm} disabled={saving}>
-                                Cancel Edit
+                        <div className="profile-form-actions">
+                            <button type="submit" disabled={saving}>
+                                {saving
+                                    ? 'Saving...'
+                                    : editingId !== null
+                                        ? 'Update notice'
+                                        : 'Create notice'}
                             </button>
-                        )}
+                            {editingId !== null && (
+                                <button type="button" className="secondary-button" onClick={resetForm} disabled={saving}>
+                                    Cancel edit
+                                </button>
+                            )}
+                        </div>
                     </form>
                 </section>
             )}
 
-            <section>
+            <section className="feature-card">
                 <h2>Available Notices</h2>
 
                 {loading ? (
@@ -217,34 +221,36 @@ export default function NoticesPage() {
                 ) : notices.length === 0 ? (
                     <p>No notices available.</p>
                 ) : (
-                    <ul>
+                    <ul className="notice-list">
                         {notices.map((notice) => (
-                            <li key={notice.id}>
-                                <article>
-                                    <h3>{notice.title}</h3>
-                                    <p>{notice.body}</p>
-                                    <p>
-                                        <strong>Audience:</strong> {notice.audience}
-                                    </p>
-                                    <p>
-                                        <strong>Status:</strong>{' '}
-                                        {notice.is_published ? 'Published' : 'Draft'}
-                                    </p>
-                                    <p>
-                                        <strong>Created:</strong>{' '}
-                                        {new Date(notice.created_at).toLocaleString()}
-                                    </p>
+                            <li className="notice-entry" key={notice.id}>
+                                <article className="notice-card">
+                                    <header className="notice-card-header">
+                                        <div>
+                                            <p className="eyebrow">{notice.audience.replaceAll('_', ' ')}</p>
+                                            <h3>{notice.title}</h3>
+                                        </div>
+                                        <span className={`status-badge ${notice.is_published ? 'status-resolved' : 'status-open'}`}>
+                                            {notice.is_published ? 'Published' : 'Draft'}
+                                        </span>
+                                    </header>
+                                    <p className="notice-body">{notice.body}</p>
+                                    <div className="notice-metadata">
+                                        <span>Created {new Date(notice.created_at).toLocaleString()}</span>
+                                    </div>
 
                                     {isAdmin && (
-                                        <div>
+                                        <div className="action-row">
                                             <button
                                                 type="button"
+                                                className="secondary-button"
                                                 onClick={() => startEditing(notice)}
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 type="button"
+                                                className="secondary-button danger-button"
                                                 onClick={() => void handleDelete(notice.id)}
                                             >
                                                 Delete

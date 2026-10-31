@@ -181,7 +181,7 @@ function AppShell() {
           </div>
 
           <div className="sidebar-version">
-            HOSTEL MANAGEMENT SYSTEM <span>v1.0.1</span>
+            HOSTEL MANAGEMENT SYSTEM <span>v1.0.2</span>
           </div>
         </div>
       </aside>

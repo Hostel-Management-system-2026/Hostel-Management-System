@@ -6,6 +6,8 @@ The fourteen backlog items P01–P14 are implemented. Each item has an assignee,
 
 Follow-up issue #44 completes the React workflows for fees and facilities that were missing from the first frozen snapshot. Students can view balances and record payments, browse facility availability, and book slots; staff can manage fee records and facility entries. The client intentionally records payments through the project API and does not connect to a payment gateway.
 
+Follow-up issue #46 completes the shared visual system across the frontend, including profile and complaint surfaces, form feedback, responsive tables, navigation, focus states, and tablet/mobile layouts.
+
 The Sprint 1 demo recording is committed as `Demo 1.mov`. Sprint 2's implementation and reports are present; the Sprint 2 demo video is a separate submission artifact and is not included in this code freeze.
 
 ## Verification evidence
@@ -13,6 +15,7 @@ The Sprint 1 demo recording is committed as `Demo 1.mov`. Sprint 2's implementat
 - GitHub Actions runs Django configuration checks and the backend test suite against PostgreSQL for pull requests and pushes to `main`.
 - The final feature PRs passed GitHub Actions. The local backend run completed 82 tests with one skipped, and `manage.py check` reported no issues.
 - The production frontend build (`npm run build`) passes with the fees and facilities workflows included.
+- The same production build validates the final responsive styling and component states.
 - Sprint 2 evidence is recorded in `SPRINT_2_RESPONSE_TIME.md`, `SPRINT_2_AVAILABILITY_REPORT.md`, `SPRINT_2_USABILITY_REPORT.md`, and `../load_tests/README.md`.
 - Implementation differences from the submitted design are recorded in `IMPLEMENTATION_DEVIATIONS.md`.
 
@@ -24,4 +27,4 @@ The Sprint 1 retrospective records formal GitHub approval for PR #31. Other Spri
 
 ## Freeze
 
-The `v1.0.1` course-project release, published after issue #44 is merged and verified, supersedes the incomplete `v1.0.0` snapshot and defines the final baseline. Feature development is frozen at `v1.0.1`. Any later code change should start with a new issue and go through a reviewed pull request with passing CI; it should not be added directly to the frozen release.
+The `v1.0.2` course-project release, published after issue #46 is merged and verified, supersedes the earlier `v1.0.0` and `v1.0.1` snapshots and defines the final baseline. Feature development is frozen at `v1.0.2`. Any later code change should start with a new issue and go through a reviewed pull request with passing CI; it should not be added directly to the frozen release.
