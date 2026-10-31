@@ -18,6 +18,9 @@ class HasAnyRole(BasePermission):
 
 class IsWarden(HasAnyRole):
     allowed_roles = frozenset({"WARDEN"})
+    
+class IsWardenOrAdmin(HasAnyRole):
+    allowed_roles = frozenset({"WARDEN", "ADMIN"})
 
 
 class IsAdmin(HasAnyRole):

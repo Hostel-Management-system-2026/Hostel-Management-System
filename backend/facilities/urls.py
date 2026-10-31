@@ -5,6 +5,8 @@ from .views import (
     FacilityListView,
     FacilityAvailabilityView,
     FacilityBookingCreateView,
+    StaffFacilityListCreateView,
+    StaffFacilityDetailView,
 )
 
 urlpatterns = [
@@ -18,5 +20,15 @@ urlpatterns = [
         "facility-bookings/",
         FacilityBookingCreateView.as_view(),
         name="facility-booking-create",
+    ),
+    path(
+        "staff/facilities/",
+        StaffFacilityListCreateView.as_view(),
+        name="staff-facility-list-create",
+    ),
+    path(
+        "staff/facilities/<int:pk>/",
+        StaffFacilityDetailView.as_view(),
+        name="staff-facility-detail",
     ),
 ]

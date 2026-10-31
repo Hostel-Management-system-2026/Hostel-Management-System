@@ -177,3 +177,104 @@ class FacilityBookingTests(APITestCase):
             response.status_code,
             status.HTTP_401_UNAUTHORIZED,
         )
+
+
+class StaffFacilityManagementTests(APITestCase):
+
+    def setUp(self):
+        self.student = User.objects.create_user(
+            username="staff_test_student",
+            password="Test@12345",
+            role="STUDENT",
+        )
+
+        self.warden = User.objects.create_user(
+            username="staff_test_warden",
+            password="Test@12345",
+            role="WARDEN",
+        )
+
+        self.admin = User.objects.create_user(
+            username="staff_test_admin",
+            password="Test@12345",
+            role="ADMIN",
+        )
+
+        self.list_url = "/api/v1/staff/facilities/"
+
+        self.facility_data = {
+            "name": "Swimming Pool",
+            "description": "Indoor swimming pool",
+            "location": "Block B",
+            "capacity": 30,
+            "is_active": True,
+        }
+
+    def test_warden_can_create_facility(self):
+        self.client.force_authenticate(user=self.warden)
+
+        response = self.client.post(
+            self.list_url,
+            self.facility_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Facility.objects.filter(name="Swimming Pool").exists()
+        )
+
+    def test_admin_can_create_facility(self):
+        self.client.force_authenticate(user=self.admin)
+
+        response = self.client.post(
+            self.list_url,
+            self.facility_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_warden_can_list_facilities(self):
+        Facility.objects.create(**self.facility_data)
+        self.client.force_authenticate(user=self.warden)
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_warden_can_update_facility(self):
+        facility = Facility.objects.create(**self.facility_data)
+        self.client.force_authenticate(user=self.warden)
+
+        response = self.client.patch(
+            f"{self.list_url}{facility.id}/",
+            {"capacity": 40},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        facility.refresh_from_db()
+        self.assertEqual(facility.capacity, 40)
+
+    def test_student_cannot_access_staff_facility_api(self):
+        self.client.force_authenticate(user=self.student)
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_unauthenticated_user_cannot_access_staff_facility_api(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_401_UNAUTHORIZED,
+        )

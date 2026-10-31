@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.permissions import IsStudent
+from common.permissions import IsStudent, IsWardenOrAdmin
 from .models import Facility, FacilityBooking
 from .serializers import FacilitySerializer, FacilityBookingSerializer
 
@@ -111,3 +111,18 @@ class FacilityBookingCreateView(APIView):
             FacilityBookingSerializer(booking).data,
             status=status.HTTP_201_CREATED,
         )
+        
+class StaffFacilityListCreateView(generics.ListCreateAPIView):
+    """Allow wardens and admins to list and create facilities."""
+
+    queryset = Facility.objects.all()
+    serializer_class = FacilitySerializer
+    permission_classes = [IsAuthenticated, IsWardenOrAdmin]
+
+
+class StaffFacilityDetailView(generics.RetrieveUpdateAPIView):
+    """Allow wardens and admins to view and update facilities."""
+
+    queryset = Facility.objects.all()
+    serializer_class = FacilitySerializer
+    permission_classes = [IsAuthenticated, IsWardenOrAdmin]        
