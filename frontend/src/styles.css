@@ -582,6 +582,8 @@ h4,
   .user-meta { display: none; }
   .logout-button { margin-left: 1px; }
   .main-content { min-height: calc(100svh - 126px); padding: 25px 17px; }
+  .page-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .date-pill { max-width: 100%; margin-top: 0; white-space: normal; }
   .feature-header { align-items: flex-start; gap: 12px; }
   .feature-header > .secondary-button { flex: 0 0 auto; }
   .feature-card { padding: 18px; }
