@@ -1,9 +1,13 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-win/
+.coverage
 db.sqlite3
 
 # Load testing credentials and generated reports
 load_tests/data/students.csv
 load_tests/results/*.csv
 load_tests/results/*.html
+load_tests/results/*.json
+load_tests/results/*.log

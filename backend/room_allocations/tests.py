@@ -189,6 +189,37 @@ class RoomAllocationTests(TestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(RoomAllocation.objects.count(), 0)
 
+    def test_admin_can_list_inventory_and_allocations(self):
+        allocation = RoomAllocation.objects.create(
+            student=self.student,
+            room=self.room,
+        )
+        self.client.force_authenticate(self.admin)
+
+        inventory_response = self.client.get("/api/v1/rooms/")
+        allocation_response = self.client.get(self.url)
+
+        self.assertEqual(inventory_response.status_code, 200)
+        self.assertEqual(inventory_response.data[0]["occupied"], 1)
+        self.assertEqual(inventory_response.data[0]["available_beds"], 0)
+        self.assertEqual(allocation_response.status_code, 200)
+        self.assertEqual(allocation_response.data[0]["id"], allocation.pk)
+
+    def test_admin_can_release_allocation_once(self):
+        allocation = RoomAllocation.objects.create(
+            student=self.student,
+            room=self.room,
+        )
+        self.client.force_authenticate(self.admin)
+        release_url = f"{self.url}{allocation.pk}/release"
+
+        first_response = self.client.patch(release_url, {}, format="json")
+        second_response = self.client.patch(release_url, {}, format="json")
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertIsNotNone(first_response.data["released_at"])
+        self.assertEqual(second_response.status_code, 409)
+
 
 class RoomAllocationCapacityConcurrencyTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")

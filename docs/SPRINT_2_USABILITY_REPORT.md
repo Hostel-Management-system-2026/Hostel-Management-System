@@ -47,4 +47,12 @@ Evaluate whether the Hostel Management System provides accessible workflows for 
 
 The preliminary self-usability walkthrough successfully verified several important WARDEN workflows, including visitor management and complaint resolution.
 
-However, formal staff usability validation remains pending. Additional participant testing is required before claiming that the NFR-04 acceptance criteria have been met.
+The Warden workflows are available for formal staff usability testing. Independent participant sessions and scoring are still required before claiming that the NFR-04 acceptance criteria have been met.
+
+## Follow-up status — 10 November 2026
+
+The earlier result remains a self-walkthrough and is not counted as independent staff evidence. A standardized eight-task protocol, five-participant results sheet, and 90% calculation rule are ready in `STAFF_USABILITY_PROTOCOL.md`. TC-015 is **workable and ready for participant testing; results are pending**. No independent participant sessions or completion score are recorded yet, so NFR-04 acceptance is unverified. Do not report the self-walkthrough as a participant study.
+
+## Source walkthrough — 11 November 2026 (not participant evidence)
+
+An implementation review confirmed the required Warden workspace and controls are present: login routes authenticated Wardens to the dashboard; the dashboard/navigation exposes Complaints, Visitors, and Leave requests; the complaints page lists records and offers sequential **Start progress** and **Mark resolved** actions; the visitors page records an arrival and offers **Record departure** for active visits; and the leave page offers **Approve** and **Reject** for pending requests. This checks that the protocol's tasks are supported by the UI. It does not measure whether independent staff can find or use these controls without help, so it does not count toward TC-015's participant target.

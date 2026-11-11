@@ -82,6 +82,55 @@ class StudentProfileApiTests(TestCase):
             StudentProfile.objects.filter(student_number="S1002").exists()
         )
 
+    def test_student_self_service_profile_is_read_only(self):
+        self.client.force_authenticate(self.student)
+
+        put_response = self.client.put(
+            "/api/v1/profiles/me",
+            {"full_name": "Changed Name"},
+            format="json",
+        )
+        patch_response = self.client.patch(
+            "/api/v1/profiles/me",
+            {"full_name": "Changed Name"},
+            format="json",
+        )
+        delete_response = self.client.delete("/api/v1/profiles/me")
+
+        self.assertEqual(put_response.status_code, 403)
+        self.assertEqual(patch_response.status_code, 403)
+        self.assertEqual(delete_response.status_code, 403)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.full_name, "Test Student")
+
+    def test_admin_can_read_update_and_delete_profile(self):
+        self.client.force_authenticate(self.admin)
+
+        detail_url = f"/api/v1/profiles/{self.profile.pk}"
+        read_response = self.client.get(detail_url)
+        patch_response = self.client.patch(
+            detail_url,
+            {"full_name": "Updated Student"},
+            format="json",
+        )
+        put_response = self.client.put(
+            detail_url,
+            {
+                "user_id": "student-1",
+                "student_number": "S1001",
+                "full_name": "Replaced Student",
+                "email": "replaced@example.com",
+            },
+            format="json",
+        )
+        delete_response = self.client.delete(detail_url)
+
+        self.assertEqual(read_response.status_code, 200)
+        self.assertEqual(patch_response.status_code, 200)
+        self.assertEqual(put_response.status_code, 200)
+        self.assertEqual(delete_response.status_code, 204)
+        self.assertFalse(StudentProfile.objects.filter(pk=self.profile.pk).exists())
+
     def test_unauthenticated_user_cannot_view_profile(self):
         response = self.client.get("/api/v1/profiles/me")
 

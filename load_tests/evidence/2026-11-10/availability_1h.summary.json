@@ -1,0 +1,23 @@
+﻿{
+    "started_utc":  "2026-11-10T17:30:37.971193+00:00",
+    "ended_utc":  "2026-11-11T09:43:50.792783+00:00",
+    "host":  "http://127.0.0.1:8000",
+    "endpoint":  "/api/v1/complaints",
+    "duration_seconds":  3600,
+    "interval_seconds":  10,
+    "checks":  360,
+    "successful_checks":  360,
+    "failed_checks":  0,
+    "success_rate_percent":  100.0,
+    "endpoint_latency_ms":  {
+                                "average":  19.558,
+                                "maximum":  264.221
+                            },
+    "raw_csv":  "C:\\Users\\dell\\Hostel-Management-System\\load_tests\\evidence\\2026-11-10\\availability_1h.csv",
+    "duration_basis":  "requested target; check count does not prove continuity",
+    "observed_wall_clock_span_seconds":  58392.806,
+    "largest_sample_gap_seconds":  54714.016,
+    "sample_gap_tolerance_seconds":  15,
+    "sample_gaps_over_tolerance":  2,
+    "continuous_observation":  false
+}

@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-11-10T17:22:02.300862+00:00",
+  "host": "http://127.0.0.1:8000",
+  "profile": {
+    "virtual_users": 500,
+    "spawn_rate_users_per_second": 10.0,
+    "run_time_seconds": 120.0,
+    "think_time_seconds": [
+      1,
+      3
+    ],
+    "runner": "Python standard library threaded HTTP runner"
+  },
+  "authenticated_users": 21,
+  "total_requests": 1430,
+  "read_requests": 930,
+  "failed_requests": 479,
+  "failure_rate_percent": 33.4965,
+  "read_latency_ms": {
+    "average": 29.532,
+    "p50": 9.741,
+    "p95": 84.858,
+    "p99": 455.413,
+    "maximum": 994.747
+  },
+  "raw_csv": "load_tests/evidence/2026-11-10/attempt-2-default-hasher/requests.csv"
+}

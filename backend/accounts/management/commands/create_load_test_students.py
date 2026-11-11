@@ -6,6 +6,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth.hashers import make_password
 from django.db import connection, transaction
 
 from profiles.models import StudentProfile
@@ -40,6 +41,11 @@ class Command(BaseCommand):
 
         User = get_user_model()
         credentials = []
+        # These are disposable synthetic accounts. Reuse one random password
+        # hash for the batch so creating 500 accounts does not run the slow
+        # production password hasher 500 times.
+        shared_password = secrets.token_urlsafe(18)
+        shared_password_hash = make_password(shared_password)
 
         csv_path = (
             Path(settings.BASE_DIR).parent
@@ -52,7 +58,6 @@ class Command(BaseCommand):
         with transaction.atomic():
             for number in range(1, count + 1):
                 username = f"loadtest_{number:04d}"
-                password = secrets.token_urlsafe(18)
 
                 user, created = User.objects.get_or_create(
                     username=username,
@@ -66,7 +71,7 @@ class Command(BaseCommand):
                 # These usernames are reserved for this local test command.
                 user.role = "STUDENT"
                 user.is_active = True
-                user.set_password(password)
+                user.password = shared_password_hash
                 user.save()
 
                 StudentProfile.objects.get_or_create(
@@ -80,7 +85,7 @@ class Command(BaseCommand):
                     },
                 )
 
-                credentials.append((username, password))
+                credentials.append((username, shared_password))
 
                 action = "Created" if created else "Updated"
                 self.stdout.write(f"{action}: {username}")

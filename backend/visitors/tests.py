@@ -126,3 +126,47 @@ class VisitorApiTests(TestCase):
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 409)
 
+    def test_warden_can_filter_active_and_completed_visits(self):
+        active = VisitorLog.objects.create(
+            visitor_name="Active Visitor",
+            student_id="student-1",
+            room_number="A-204",
+            entry_at=timezone.now() - timedelta(minutes=5),
+        )
+        completed = VisitorLog.objects.create(
+            visitor_name="Completed Visitor",
+            student_id="student-2",
+            room_number="B-101",
+            entry_at=timezone.now() - timedelta(hours=2),
+            exit_at=timezone.now() - timedelta(hours=1),
+        )
+        self.client.force_authenticate(self.warden)
+
+        active_response = self.client.get("/api/v1/visitors?active=true")
+        completed_response = self.client.get("/api/v1/visitors?active=false")
+        all_response = self.client.get("/api/v1/visitors")
+
+        self.assertEqual(active_response.status_code, 200)
+        self.assertEqual([row["id"] for row in active_response.data], [active.pk])
+        self.assertEqual(completed_response.status_code, 200)
+        self.assertEqual([row["id"] for row in completed_response.data], [completed.pk])
+        self.assertEqual(len(all_response.data), 2)
+
+    def test_exit_can_use_server_timestamp_when_not_supplied(self):
+        record = VisitorLog.objects.create(
+            visitor_name="Morgan Lee",
+            student_id="student-1",
+            room_number="A-204",
+            entry_at=timezone.now() - timedelta(minutes=5),
+        )
+        self.client.force_authenticate(self.warden)
+
+        response = self.client.patch(
+            f"/api/v1/visitors/{record.pk}/exit",
+            {},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.data["exit_at"])
+

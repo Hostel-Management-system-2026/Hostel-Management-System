@@ -20,6 +20,11 @@ class NoticeApiTests(TestCase):
             role="STUDENT",
             is_authenticated=True,
         )
+        self.warden = SimpleNamespace(
+            pk="warden-1",
+            role="WARDEN",
+            is_authenticated=True,
+        )
         self.notice = Notice.objects.create(
             title="Hostel meeting",
             body="Meeting at 5 PM.",
@@ -112,3 +117,37 @@ class NoticeApiTests(TestCase):
         response = self.client.get("/api/v1/notices")
 
         self.assertIn(response.status_code, (401, 403))
+
+    def test_admin_can_list_read_update_and_delete_notice(self):
+        self.client.force_authenticate(self.admin)
+        detail_url = f"/api/v1/notices/{self.notice.pk}"
+
+        list_response = self.client.get("/api/v1/notices")
+        read_response = self.client.get(detail_url)
+        update_response = self.client.patch(
+            detail_url,
+            {"title": "Updated meeting"},
+            format="json",
+        )
+        delete_response = self.client.delete(detail_url)
+
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(read_response.status_code, 200)
+        self.assertEqual(update_response.status_code, 200)
+        self.assertEqual(delete_response.status_code, 204)
+        self.assertFalse(Notice.objects.filter(pk=self.notice.pk).exists())
+
+    def test_warden_cannot_read_or_update_notices(self):
+        self.client.force_authenticate(self.warden)
+
+        list_response = self.client.get("/api/v1/notices")
+        detail_response = self.client.get(f"/api/v1/notices/{self.notice.pk}")
+        update_response = self.client.patch(
+            f"/api/v1/notices/{self.notice.pk}",
+            {"title": "Unauthorized"},
+            format="json",
+        )
+
+        self.assertEqual(list_response.status_code, 403)
+        self.assertEqual(detail_response.status_code, 403)
+        self.assertEqual(update_response.status_code, 403)

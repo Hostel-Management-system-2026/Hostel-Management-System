@@ -110,3 +110,73 @@ Formal production-capacity validation should use PostgreSQL, deployment-like inf
 The local load-testing setup successfully completed a test with 500 simulated concurrent student users and reported zero failed requests across 24,366 requests.
 
 Further deployment-like testing is required before making production-capacity claims.
+
+## Reproducible execution — 10 November 2026
+
+The current Windows/Python 3.14 environment could not build Locust's `gevent` dependency, so this run used `run_threaded_load.py`, a standard-library HTTP runner with the same 500 users, 10 users/second ramp, two-minute duration, 1–3 second think time, login, and six read workflows. It writes per-request timestamps, status, latency, and errors to CSV and a machine-readable summary JSON.
+
+Run from the repository root. These settings and accounts are only for local synthetic testing; the low PBKDF2 work factor is not suitable for real accounts or deployment.
+
+```powershell
+$env:DJANGO_SETTINGS_MODULE = 'config.load_test_settings'
+python backend/manage.py migrate --noinput
+python backend/manage.py create_load_test_students --count 500 --confirm
+python load_tests/prepare_test_data.py
+```
+
+In a second terminal, from the repository root:
+
+```powershell
+$env:DJANGO_SETTINGS_MODULE = 'config.load_test_settings'
+python load_tests/run_dev_server.py 127.0.0.1:8000 --noreload --verbosity 0
+```
+
+In a third terminal:
+
+```powershell
+python load_tests/run_threaded_load.py `
+  --host http://127.0.0.1:8000 `
+  --users 500 `
+  --spawn-rate 10 `
+  --run-time 120 `
+  --output load_tests/evidence/2026-11-10/500_user_requests.csv
+```
+
+After both the load run and any availability observation finish, remove the synthetic users, their dependent profiles, the matching synthetic menu, and the ignored credential file:
+
+```powershell
+python load_tests/cleanup_test_data.py
+```
+
+### Run result
+
+| Metric | Result |
+|---|---:|
+| Accounts authenticated | 500 / 500 |
+| Total requests (login + reads) | 12,788 |
+| Read requests | 12,288 |
+| Failed requests | 0 |
+| Read latency p50 / p95 / p99 | 2,089.7 / 3,818.2 / 5,737.2 ms |
+| Maximum read latency | 8,572.5 ms |
+| Overall throughput during the 120-second profile | 106.6 requests/second |
+
+Raw data stored in the local working tree: [`500_user_requests.csv`](evidence/2026-11-10/500_user_requests.csv) and [`500_user_requests.summary.json`](evidence/2026-11-10/500_user_requests.summary.json). The two failed diagnostic attempts are retained in the same evidence folder and are not counted as the final run.
+
+The profile ran against SQLite and Django's local development server on the same Windows machine. The test-specific settings used PBKDF2 with 1,000 iterations for disposable synthetic accounts and the load server used a larger connection backlog. These results are repeatable local evidence, not a production-capacity or real-password-hashing result.
+
+## Availability observation
+
+With the local server running and synthetic credentials available, run a one-hour, ten-second-interval authenticated API observation as follows:
+
+```powershell
+python load_tests/monitor_availability.py `
+  --host http://127.0.0.1:8000 `
+  --duration-seconds 3600 `
+  --interval-seconds 10 `
+  --refresh-seconds 240 `
+  --output load_tests/evidence/2026-11-10/availability_1h.csv
+```
+
+The monitor refreshes its JWT during the run and writes each sample immediately to CSV. It also writes a summary JSON after the final check. This is a local development-server observation, not a production uptime guarantee.
+
+`--resume` appends checks until the requested total row count is reached; it does not replace time lost during an interruption. The summary records the wall-clock span, largest sample gap, and whether the samples meet a continuous-observation check (no gap over 1.5 times the interval). For a one-hour continuity target, start a fresh CSV and keep the monitor running without interruption. Treat resumed samples with excessive gaps as partial evidence.

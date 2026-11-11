@@ -8,20 +8,26 @@ Follow-up issue #44 completes the React workflows for fees and facilities that w
 
 Follow-up issue #46 completes the shared visual system across the frontend, including profile and complaint surfaces, form feedback, responsive tables, navigation, focus states, and tablet/mobile layouts.
 
-The Sprint 1 demo recording is committed as `Demo 1.mov`. Sprint 2's implementation and reports are present; the Sprint 2 demo video is a separate submission artifact and is not included in this code freeze.
+The Sprint 1 and Sprint 2 demo recordings are committed as `Demo 1.mov` and `Demo 2.mov`.
 
 ## Verification evidence
 
 - GitHub Actions runs Django configuration checks and the backend test suite against PostgreSQL for pull requests and pushes to `main`.
 - The final feature PRs passed GitHub Actions. The local backend run completed 82 tests with one skipped, and `manage.py check` reported no issues.
 - The production frontend build (`npm run build`) passes with the fees and facilities workflows included.
-- The same production build validates the final responsive styling and component states.
-- Sprint 2 evidence is recorded in `SPRINT_2_RESPONSE_TIME.md`, `SPRINT_2_AVAILABILITY_REPORT.md`, `SPRINT_2_USABILITY_REPORT.md`, and `../load_tests/README.md`.
+- On 4 November 2026, the local Django system check passed and the backend suite ran 90 tests: 89 passed and one PostgreSQL-only concurrency test was skipped on SQLite.
+- On 4 November 2026, the frontend production build (`npm run build`) passed with TypeScript and Vite.
+- The coverage run measured 93.1% application statement coverage and 67.7% application branch coverage; see `CODE_COVERAGE_REPORT.md` and `BRANCH_COVERAGE_REPORT.md`.
+- Sprint 2 evidence is recorded in `SPRINT_2_RESPONSE_TIME.md`, `SPRINT_2_AVAILABILITY_REPORT.md`, `SPRINT_2_USABILITY_REPORT.md`, and `../load_tests/README.md`. Current planned-case statuses are summarized in `TEST_PLAN_EXECUTION_ADDENDUM.md`.
+- `DESIGN_API_AND_SEQUENCE_ADDENDUM.md` supplies two implementation-aligned sequence diagrams, endpoint design, error handling, and traceability alongside the architecture PDF.
+- Unit/API and system validation records are in `UNIT_TEST_REPORT.md` and `SYSTEM_VALIDATION_REPORT.md`.
 - Implementation differences from the submitted design are recorded in `IMPLEMENTATION_DEVIATIONS.md`.
 
 ## Limits of the evidence
 
-Performance and load results were collected with a local development server and SQLite; they do not establish production capacity. Availability sampling is preliminary, and the usability report is a self-walkthrough rather than an independent participant study. Keep these limitations attached to any presentation of the results.
+Performance, load, and availability results were collected with a local development server and SQLite; they do not establish production capacity or a production availability SLA. All 360 recorded availability checks succeeded, meeting TC-014's sampled success-rate criterion; long timestamp gaps limit interpretation as continuous uptime. The usability report is a self-walkthrough rather than an independent participant study. Keep these limitations attached to any presentation of the results.
+
+The SQLite backend run skips the PostgreSQL row-lock concurrency test; the PostgreSQL suite has run that test. The reproducible 500-user local profile has per-request CSV and JSON summary evidence under `load_tests/evidence/2026-11-10/`; it used the standard-library threaded runner because Locust could not be installed in the available Python environment. Branch coverage is 67.7%, so additional tests are needed before claiming comprehensive condition coverage.
 
 The Sprint 1 retrospective records formal GitHub approval for PR #31. Other Sprint 1 reviews were documented retrospectively because the PRs had already merged.
 

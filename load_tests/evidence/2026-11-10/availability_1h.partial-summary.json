@@ -1,0 +1,22 @@
+{
+  "status": "PAUSED",
+  "started_utc": "2026-11-10T17:30:37.971193+00:00",
+  "last_check_utc": "2026-11-10T17:57:27.970205+00:00",
+  "target_duration_seconds": 3600,
+  "completed_checks": 162,
+  "target_checks": 360,
+  "remaining_checks": 198,
+  "observed_elapsed_seconds": 1610.015,
+  "successful_checks": 162,
+  "failed_checks": 0,
+  "success_rate_percent": 100,
+  "token_refreshes": 6,
+  "endpoint": "/api/v1/complaints",
+  "latency_ms": {
+    "p50": 10.383,
+    "p95": 29.152,
+    "p99": 177.149,
+    "maximum": 264.221
+  },
+  "raw_csv": "load_tests/evidence/2026-11-10/availability_1h.csv"
+}
